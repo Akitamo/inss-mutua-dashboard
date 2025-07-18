@@ -69,7 +69,7 @@ st.markdown("""
 def main():
     """Función principal de la aplicación"""
     
-    # Header
+    # Header en área principal
     st.markdown('<h1 class="main-header">🏥 Dashboard INSS vs Mutua</h1>', 
                 unsafe_allow_html=True)
     st.markdown('<p class="sub-header">Análisis comparativo de duración de bajas laborales</p>', 
@@ -80,7 +80,10 @@ def main():
         st.error("❌ Error en las importaciones. Verifica que todos los módulos estén disponibles.")
         return
     
-    # Sidebar - Upload y filtros
+    # Inicializar variables
+    df_filtered = None
+    
+    # Sidebar - Solo upload y filtros
     with st.sidebar:
         st.header("📤 Carga de Datos")
         
@@ -138,12 +141,6 @@ def main():
                     df_filtered = processor.apply_filters(
                         df, diagnosticos, genero, edad_grupos, episodios_range
                     )
-                    
-                    # Visualización principal
-                    if not df_filtered.empty:
-                        display_dashboard(df_filtered)
-                    else:
-                        st.warning("⚠️ No hay datos con los filtros aplicados")
                 else:
                     st.error("❌ Error al procesar el archivo")
             
@@ -166,6 +163,25 @@ def main():
             - Duropt Inss min (Duración Óptima INSS)
             - Minmin, P20min, P40min, P60min, P80min, P99min (Percentiles)
             """)
+
+    # ÁREA PRINCIPAL - Aquí va el dashboard
+    if df_filtered is not None:
+        if not df_filtered.empty:
+            display_dashboard(df_filtered)
+        else:
+            st.warning("⚠️ No hay datos con los filtros aplicados")
+    else:
+        # Placeholder cuando no hay datos
+        st.info("📁 **Instrucciones de Uso:**")
+        st.write("1. Sube tu archivo Excel usando el panel lateral")
+        st.write("2. Ajusta los filtros según tus necesidades")
+        st.write("3. Visualiza los resultados comparativos")
+        
+        st.info("📋 **Características del Dashboard:**")
+        st.write("• Análisis comparativo INSS vs Mutua")
+        st.write("• Visualización de percentiles con gradientes")
+        st.write("• Filtros dinámicos por diagnóstico, género y edad")
+        st.write("• Métricas resumen y estadísticas detalladas")
 
 def display_dashboard(df):
     """Mostrar dashboard principal con métricas y visualizaciones"""
